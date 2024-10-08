@@ -348,6 +348,9 @@ pub struct Spacing {
     /// Button size is text size plus this on each side
     pub button_padding: Vec2,
 
+    /// Space between the border and the content of a [`crate::TextEdit`]
+    pub textedit_padding: Vec2,
+
     /// Horizontal and vertical margins within a menu frame.
     pub menu_margin: Margin,
 
@@ -1242,6 +1245,7 @@ impl Default for Spacing {
             window_margin: Margin::same(6.0),
             menu_margin: Margin::same(6.0),
             button_padding: vec2(4.0, 1.0),
+            textedit_padding: vec2(4.0, 1.0),
             indent: 18.0, // match checkbox/radio-button with `button_padding.x + icon_width + icon_spacing`
             interact_size: vec2(40.0, 18.0),
             slider_width: 100.0,
@@ -1674,6 +1678,7 @@ impl Spacing {
             window_margin,
             menu_margin,
             button_padding,
+            textedit_padding,
             indent,
             interact_size,
             slider_width,
@@ -1711,6 +1716,10 @@ impl Spacing {
 
                 ui.label("Button padding");
                 ui.add(two_drag_values(button_padding, 0.0..=20.0));
+                ui.end_row();
+
+                ui.label("TextEdit padding");
+                ui.add(two_drag_values(textedit_padding, 0.0..=20.0));
                 ui.end_row();
 
                 ui.label("Interact size")

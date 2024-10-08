@@ -423,12 +423,13 @@ impl<'t> TextEdit<'t> {
             .background_color
             .unwrap_or(ui.visuals().extreme_bg_color);
         let margin = self.margin;
+        let padding = ui.spacing().textedit_padding;
         let mut output = self.show_content(ui);
 
         // TODO(emilk): return full outer_rect in `TextEditOutput`.
         // Can't do it now because this fix is ging into a patch release.
         let outer_rect = output.response.rect;
-        let inner_rect = outer_rect - margin;
+        let inner_rect = (outer_rect - margin).shrink2(padding);
         output.response.rect = inner_rect;
 
         if frame {
@@ -500,9 +501,11 @@ impl<'t> TextEdit<'t> {
         let prev_text = text.as_str().to_owned();
 
         let font_id = font_selection.resolve(ui.style());
+        let padding = ui.spacing().textedit_padding;
         let row_height = ui.fonts(|f| f.row_height(&font_id));
         const MIN_WIDTH: f32 = 24.0; // Never make a [`TextEdit`] more narrow than this.
-        let available_width = (ui.available_width() - margin.sum().x).at_least(MIN_WIDTH);
+        let available_width =
+            (ui.available_width() - margin.sum().x - padding.x * 2.0).at_least(MIN_WIDTH);
         let desired_width = desired_width.unwrap_or_else(|| ui.spacing().text_edit_width);
         let wrap_width = if ui.layout().horizontal_justify() {
             available_width
@@ -532,9 +535,9 @@ impl<'t> TextEdit<'t> {
         };
         let desired_height = (desired_height_rows.at_least(1) as f32) * row_height;
         let desired_inner_size = vec2(desired_width, galley.size().y.max(desired_height));
-        let desired_outer_size = (desired_inner_size + margin.sum()).at_least(min_size);
+        let desired_outer_size = (desired_inner_size + margin.sum() + padding).at_least(min_size);
         let (auto_id, outer_rect) = ui.allocate_space(desired_outer_size);
-        let rect = outer_rect - margin; // inner rect (excluding frame/margin).
+        let rect = (outer_rect - margin).shrink2(padding); // inner rect (excluding frame/margin).
 
         let id = id.unwrap_or_else(|| {
             if let Some(id_salt) = id_salt {
